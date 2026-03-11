@@ -11,3 +11,42 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model User {
+  id         String   @id @default(uuid())
+  email      String   @unique
+  password   String
+  created_at DateTime @default(now())
+
+  subscriptions Subscription[]
+  payments      Payment[]
+}
+
+model Subscription {
+  id         String    @id @default(uuid())
+  user_id    String
+  plan       String
+  status     String
+  start_date DateTime  @default(now())
+  end_date   DateTime?
+
+  user User @relation(fields: [user_id], references: [id])
+}
+
+model Payment {
+  id         String   @id @default(uuid())
+  user_id    String
+  amount     Float
+  status     String
+  payment_id String? // id do Mercado Pago
+  created_at DateTime @default(now())
+
+  user User @relation(fields: [user_id], references: [id])
+}
+
+model WebhookEvent {
+  id         String   @id @default(uuid())
+  event_type String
+  payload    Json
+  created_at DateTime @default(now())
+}
