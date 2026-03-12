@@ -1,26 +1,95 @@
-import { Injectable } from '@nestjs/common';
-import { CreateSubscriptionDto } from './dto/create-subscription.dto';
-import { UpdateSubscriptionDto } from './dto/update-subscription.dto';
+import { Injectable } from "@nestjs/common";
+import {
+  CreateSubscriptionDto,
+  StatusSubscription,
+} from "./dto/create-subscription.dto";
+import { UpdateSubscriptionDto } from "./dto/update-subscription.dto";
+import { PrismaService } from "src/prisma/prisma.service";
 
 @Injectable()
 export class SubscriptionsService {
-  create(createSubscriptionDto: CreateSubscriptionDto) {
-    return 'This action adds a new subscription';
+  constructor(private readonly prisma: PrismaService) {}
+
+  async create(createSubscriptionDto: CreateSubscriptionDto, user_id: string) {
+    try {
+      return await this.prisma.subscription.create({
+        data: {
+          status: createSubscriptionDto.status,
+          start_date: createSubscriptionDto.start_date,
+          end_date: createSubscriptionDto.end_date,
+          user_id: user_id,
+        },
+      });
+    } catch (error) {
+      console.error("Error occurred while creating subscription:", error);
+      throw error;
+    }
   }
 
-  findAll() {
-    return `This action returns all subscriptions`;
+  async findAll() {
+    try {
+      return await this.prisma.subscription.findMany({
+        include: {
+          user: {
+            select: {
+              id: true,
+              email: true,
+            },
+          },
+        },
+      });
+    } catch (error) {
+      console.error("Error occurred while finding all subscriptions:", error);
+      throw error;
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} subscription`;
+  async verifyActiveSubscription(user_id: string) {
+    try {
+      const activeSubscription = await this.prisma.subscription.findFirst({
+        where: {
+          user_id: user_id,
+          status: StatusSubscription.ACTIVE,
+        },
+      });
+      return !!activeSubscription;
+    } catch (error) {
+      console.error(
+        "Error occurred while verifying active subscription:",
+        error
+      );
+      throw error;
+    }
   }
 
-  update(id: number, updateSubscriptionDto: UpdateSubscriptionDto) {
-    return `This action updates a #${id} subscription`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} subscription`;
+  async verifyEndDateSubscription(user_id: string) {
+    try {
+      const currentDate = new Date();
+      const expiredSubscription = await this.prisma.subscription.findFirst({
+        where: {
+          user_id: user_id,
+          end_date: {
+            lt: currentDate,
+          },
+        },
+      });
+      if (expiredSubscription) {
+        await this.prisma.subscription.update({
+          where: {
+            id: expiredSubscription.id,
+          },
+          data: {
+            status: StatusSubscription.EXPIRED,
+          },
+        });
+      }
+      return !!expiredSubscription;
+    } catch (error) {
+      console.error(
+        "Error occurred while verifying end date subscription:",
+        error
+      );
+      throw error;
+    }
   }
 }
