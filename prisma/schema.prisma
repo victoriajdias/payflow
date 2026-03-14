@@ -32,12 +32,13 @@ model Subscription {
 }
 
 model Payment {
-  id         String   @id @default(uuid())
+  id         String        @id @default(uuid())
   user_id    String
   amount     Float
-  status     String
+  plan_type  PlanType
+  status     StatusPayment
   payment_id String? // id do Mercado Pago
-  created_at DateTime @default(now())
+  created_at DateTime      @default(now())
 
   user User @relation(fields: [user_id], references: [id])
 }
@@ -47,4 +48,17 @@ model WebhookEvent {
   event_type String
   payload    Json
   created_at DateTime @default(now())
+}
+
+enum StatusPayment {
+  ACTIVE
+  INACTIVE
+  PENDING
+  EXPIRED
+  CANCELLED
+}
+
+enum PlanType {
+  MONTHLY
+  YEARLY
 }
