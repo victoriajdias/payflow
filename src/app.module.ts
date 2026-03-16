@@ -5,9 +5,10 @@ import { AuthModule } from "./auth/auth.module";
 import { UsersModule } from "./users/users.module";
 import { SubscriptionsModule } from "./subscriptions/subscriptions.module";
 import { PaymentsModule } from "./payments/payments.module";
+import { WebhookModule } from './webhook/webhook.module';
 
 @Module({
-  imports: [AuthModule, UsersModule, SubscriptionsModule, PaymentsModule],
+  imports: [AuthModule, UsersModule, SubscriptionsModule, PaymentsModule, WebhookModule],
   controllers: [AppController],
   providers: [AppService],
 })
