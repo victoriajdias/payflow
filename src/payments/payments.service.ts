@@ -59,25 +59,10 @@ export class PaymentsService {
           payment_id: preference.id,
         },
       });
+
       return { payment_id: payment.id, checkout_url: preference.init_point };
     } catch (error) {
       throw new Error("Failed to create payment", { cause: error });
     }
-  }
-
-  findAll() {
-    return `This action returns all payments`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} payment`;
-  }
-
-  update(id: number, updatePaymentDto: UpdatePaymentDto) {
-    return `This action updates a #${id} payment`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} payment`;
   }
 }

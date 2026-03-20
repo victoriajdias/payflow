@@ -23,7 +23,7 @@ export class MercadoPagoService {
       },
       auto_return: "approved",
       notification_url:
-        "https://df49-2804-7f0-6402-e672-fcf9-f536-d9d-8e7f.ngrok-free.app/webhook/mercadopago",
+        "https://a387-2804-7f0-6402-e672-28fc-a018-5a1-4f91.ngrok-free.app/webhook/mercadopago",
       external_reference: payment_id,
     };
     const result = await preference.create({ body });
