@@ -59,7 +59,6 @@ export class PaymentsService {
           payment_id: preference.id,
         },
       });
-
       return { payment_id: payment.id, checkout_url: preference.init_point };
     } catch (error) {
       throw new Error("Failed to create payment", { cause: error });

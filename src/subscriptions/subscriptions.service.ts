@@ -1,10 +1,7 @@
 import { Injectable } from "@nestjs/common";
-import {
-  CreateSubscriptionDto,
-  StatusSubscription,
-} from "./dto/create-subscription.dto";
-import { UpdateSubscriptionDto } from "./dto/update-subscription.dto";
+import { CreateSubscriptionDto } from "./dto/create-subscription.dto";
 import { PrismaService } from "src/prisma/prisma.service";
+import { StatusPayment } from "@prisma/client";
 
 @Injectable()
 export class SubscriptionsService {
@@ -17,6 +14,7 @@ export class SubscriptionsService {
           status: createSubscriptionDto.status,
           start_date: createSubscriptionDto.start_date,
           end_date: createSubscriptionDto.end_date,
+          plan: createSubscriptionDto.plan,
           user_id: user_id,
         },
       });
@@ -26,30 +24,37 @@ export class SubscriptionsService {
     }
   }
 
-  async findAll() {
-    try {
-      return await this.prisma.subscription.findMany({
-        include: {
-          user: {
-            select: {
-              id: true,
-              email: true,
-            },
-          },
+ async findActiveByUser(user_id: string) {
+  const now = new Date();
+
+  return await this.prisma.subscription.findFirst({
+    where: {
+      user_id,
+      status: "ACTIVE",
+      start_date: {
+        lte: now,
+      },
+      end_date: {
+        gte: now,
+      },
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          email: true,
         },
-      });
-    } catch (error) {
-      console.error("Error occurred while finding all subscriptions:", error);
-      throw error;
-    }
-  }
+      },
+    },
+  });
+}
 
   async verifyActiveSubscription(user_id: string) {
     try {
       const activeSubscription = await this.prisma.subscription.findFirst({
         where: {
           user_id: user_id,
-          status: StatusSubscription.ACTIVE,
+          status: StatusPayment.ACTIVE,
         },
       });
       return !!activeSubscription;
@@ -79,7 +84,7 @@ export class SubscriptionsService {
             id: expiredSubscription.id,
           },
           data: {
-            status: StatusSubscription.EXPIRED,
+            status: StatusPayment.EXPIRED,
           },
         });
       }

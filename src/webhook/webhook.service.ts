@@ -68,6 +68,7 @@ export class WebhookService {
         data: {
           user_id: dbPayment.user_id,
           status: "ACTIVE",
+          plan: dbPayment.plan_type,
           start_date: new Date(),
           end_date: calcularData(dbPayment.plan_type),
         },

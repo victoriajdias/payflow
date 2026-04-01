@@ -15,7 +15,6 @@ import { CurrentUser } from "src/auth/decorator/currentuser";
 import { AuthGuard } from "src/auth/guard/auth.guard";
 import { SubscriptionGuard } from "./guard/subscription.guard";
 
-@UseGuards(SubscriptionGuard)
 @UseGuards(AuthGuard)
 @Controller("subscriptions")
 export class SubscriptionsController {
@@ -31,8 +30,9 @@ export class SubscriptionsController {
   }
 
   @Get("me")
-  findAll() {
-    return this.subscriptionsService.findAll();
+  findActiveByUser(@CurrentUser() user: any) {
+    const user_id = user.user_id;
+    return this.subscriptionsService.findActiveByUser(user_id);
   }
 
   @Get("verify-active")

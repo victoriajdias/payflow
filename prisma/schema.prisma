@@ -25,6 +25,7 @@ model Subscription {
   id         String    @id @default(uuid())
   user_id    String
   status     String
+  plan       PlanType
   start_date DateTime  @default(now())
   end_date   DateTime?
 

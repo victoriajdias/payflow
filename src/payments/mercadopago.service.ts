@@ -17,13 +17,12 @@ export class MercadoPagoService {
     const body = {
       items: items,
       back_urls: {
-        success: "/success",
-        failure: "/failure",
-        pending: "/pending",
+        success: `${process.env.APP_URL}/success`,
+        failure: `${process.env.APP_URL}/failure`,
+        pending: `${process.env.APP_URL}/pending`,
       },
       auto_return: "approved",
-      notification_url:
-        "https://a387-2804-7f0-6402-e672-28fc-a018-5a1-4f91.ngrok-free.app/webhook/mercadopago",
+      notification_url: `${process.env.WEBHOOK_URL}`,
       external_reference: payment_id,
     };
     const result = await preference.create({ body });
